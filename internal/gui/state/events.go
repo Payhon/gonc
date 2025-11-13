@@ -22,7 +22,8 @@ type AppLifecyclePayload struct {
 
 // LogPayload 描述一条日志消息。
 type LogPayload struct {
-	Level   string `json:"level"`
-	Message string `json:"message"`
-	Source  string `json:"source,omitempty"`
+	Level     string `json:"level"`
+	Message   string `json:"message"`
+	Source    string `json:"source,omitempty"`
+	Timestamp string `json:"timestamp"`
 }

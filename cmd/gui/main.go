@@ -19,15 +19,21 @@ import (
 func main() {
 	ctx := context.Background()
 
-	appLogger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+	eventHub := state.NewEventHub()
+	logService := state.NewLogService(eventHub, 0)
+
+	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
-	}))
+	})
+	appLogger := slog.New(logService.WrapHandler(textHandler))
+	slog.SetDefault(appLogger)
+
+	appLogger.Info("gonc GUI 启动中")
 
 	// 初始化基础依赖
 	cfgManager := config.NewManager()
-	eventHub := state.NewEventHub()
 	serviceRegistry := services.NewRegistry(cfgManager, eventHub)
-	appBridge := bridge.NewAppBridge(cfgManager, eventHub, serviceRegistry)
+	appBridge := bridge.NewAppBridge(cfgManager, eventHub, logService, serviceRegistry)
 
 	err := wails.Run(&options.App{
 		Title:     "gonc GUI",
